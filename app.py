@@ -55,6 +55,9 @@ class MainApp:
         # submit button
         ttk.Button(self.frame1, width=12, text='Submit', command=self.twoFunction).grid(row=7, column=2)
 
+        # submit button
+        ttk.Button(self.frame1, width=12, text='Clear', command=self.clear).grid(row=7, column=3)
+
         self.labelVS = Label(self.frame1, text="VS", relief="groove", width=15)
         self.labelVS.grid(row=2, column=2)
 
@@ -118,6 +121,18 @@ class MainApp:
         self.label17.grid(row=7, column=0)
 
         self.leagueCombobox.bind("<<ComboboxSelected>>", self.getVal)
+
+    def clear(self):
+        self.homeOddEntry.delete(0,'end')
+        self.drawOddEntry.delete(0, 'end')
+        self.awayOddEntry.delete(0, 'end')
+        self.percentLabel.config(text='')
+        self.awayPredictedLabel.config(text="",bg='white')
+        self.homePredictedLabel.config(text='',bg='white')
+        self.drawPredictedLabel.config(text='',bg='white')
+        self.homeTrueOdds.config(text='')
+        self.awayTrueOdds.config(text='')
+        self.drawTrueOdds.config(text='')
 
     # function for showing leagues in combobox
     def leagueList(self):
