@@ -28,7 +28,7 @@ class MainApp:
         self.logo.grid(row=0, column=0, rowspan=4, sticky=W + E + N + S, padx=5, pady=5)
 
         # label 0
-        label = ttk.Label(self.frame1, text='Please choose a league')
+        label = ttk.Label(self.frame1, text='Choose a league')
         label.grid(row=0, column=2)
 
         # Drop down league
@@ -53,10 +53,10 @@ class MainApp:
         self.awayTeamCombobox.grid(row=2, column=3)
 
         # submit button
-        ttk.Button(self.frame1, width=12, text='Submit', command=self.twoFunction).grid(row=7, column=2)
+        ttk.Button(self.frame1, width=12, text='Submit', command=self.twoFunction).grid(row=8, column=2)
 
-        # submit button
-        ttk.Button(self.frame1, width=12, text='Clear', command=self.clear).grid(row=7, column=3)
+        # clear button
+        ttk.Button(self.frame1, width=12, text='Clear', command=self.clear).grid(row=8, column=3)
 
         self.labelVS = Label(self.frame1, text="VS", relief="groove", width=15)
         self.labelVS.grid(row=2, column=2)
@@ -94,6 +94,9 @@ class MainApp:
         self.awayPredictedLabel = Label(self.frame1, text="", width=15)
         self.awayPredictedLabel.grid(row=6, column=3)
 
+        self.zeroToTwo = Label(self.frame1, text="", width=15)
+        self.zeroToTwo.grid(row=7, column=1)
+
         self.label10 = Label(self.frame1, text="Enter given odds: ", relief="groove", width=15, anchor="e")
         self.label10.grid(row=4, column=0)
 
@@ -114,11 +117,15 @@ class MainApp:
 
         # % label
         self.percentLabel = Label(self.frame1, text="", width=15)
-        self.percentLabel.grid(row=7, column=1)
+        self.percentLabel.grid(row=8, column=1)
 
         # Bias label
         self.label17 = Label(self.frame1, text="Bias: ", relief="groove", width=15, anchor="e")
-        self.label17.grid(row=7, column=0)
+        self.label17.grid(row=8, column=0)
+
+        # Goal label
+        self.labeGoal = Label(self.frame1, text="Goals: ", relief="groove", width=15, anchor="e")
+        self.labeGoal.grid(row=7, column=0)
 
         self.leagueCombobox.bind("<<ComboboxSelected>>", self.getVal)
 
@@ -203,7 +210,7 @@ class MainApp:
             poisson_model = smf.glm(formula="goals ~ home + team + opponent", data=goal_model_data,
                                     family=sm.families.Poisson()).fit()
 
-            # print(poisson_model.summary())
+            #print(poisson_model.summary())
 
             def simulate_match(foot_model, homeTeam, awayTeam, max_goals=10):
                 home_goals_avg = foot_model.predict(pd.DataFrame(data={'team': homeTeam,
@@ -216,7 +223,13 @@ class MainApp:
                              [home_goals_avg, away_goals_avg]]
                 return np.outer(np.array(team_pred[0]), np.array(team_pred[1]))
 
-            match = simulate_match(poisson_model, home, away, max_goals=10)
+            match = simulate_match(poisson_model, home, away, max_goals=4)
+            print(match*100)
+            self.zeroToTwo.config(text=round(100-(100*(match[0][0]+match[0][1]+match[0][2]+match[1][0]+match[1][1]+match[2][0]))))
+            #matn = len(match)
+            #print(np.array([np.sum(i) if i + j < 3 else 1 for i in range(match) for j in range(match)]).reshape(match, match))
+
+
             self.homePredictedLabel.config(text=round(1 / np.sum(np.tril(match, -1)), 2))
             self.drawPredictedLabel.config(text=round(1 / np.sum(np.diag(match)), 2))
             self.awayPredictedLabel.config(text=round(1 / np.sum(np.triu(match, 1)), 2))
